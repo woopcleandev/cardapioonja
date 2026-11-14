@@ -15,12 +15,51 @@ function buildWhatsAppUrl(message: string): string {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
+let sharedAudioCtx: AudioContext | null = null;
+
+function playClickSound() {
+  try {
+    const AudioCtx =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext?: typeof AudioContext })
+        .webkitAudioContext;
+    if (!AudioCtx) return;
+
+    if (!sharedAudioCtx) {
+      sharedAudioCtx = new AudioCtx();
+    }
+    if (sharedAudioCtx.state === 'suspended') {
+      void sharedAudioCtx.resume();
+    }
+
+    const now = sharedAudioCtx.currentTime;
+    const oscillator = sharedAudioCtx.createOscillator();
+    const gainNode = sharedAudioCtx.createGain();
+
+    oscillator.type = 'triangle';
+    oscillator.frequency.setValueAtTime(720, now);
+    oscillator.frequency.exponentialRampToValueAtTime(260, now + 0.045);
+
+    gainNode.gain.setValueAtTime(0.18, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.055);
+
+    oscillator.connect(gainNode);
+    gainNode.connect(sharedAudioCtx.destination);
+
+    oscillator.start(now);
+    oscillator.stop(now + 0.06);
+  } catch {
+    // Ignore audio errors if blocked by browser policy
+  }
+}
+
 export default function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
 
   const toggleVideo = () => {
+    playClickSound();
     const video = videoRef.current;
     if (!video) return;
     if (video.paused) {
@@ -33,6 +72,7 @@ export default function App() {
   };
 
   const toggleMute = () => {
+    playClickSound();
     const video = videoRef.current;
     if (!video) return;
     video.muted = !video.muted;
@@ -124,7 +164,8 @@ export default function App() {
             )}
             target="_blank"
             rel="noopener noreferrer"
-            className="min-h-[68px] px-4 py-3.5 rounded-xl border-2 border-slate-300 bg-transparent hover:bg-slate-900 text-white transition-all flex flex-col items-center justify-center text-center gap-1 focus-visible:outline-2 focus-visible:outline-amber-400"
+            onClick={playClickSound}
+            className="min-h-[68px] px-4 py-3.5 rounded-xl border-2 border-slate-300 bg-transparent hover:bg-slate-900 text-white transition-all flex flex-col items-center justify-center text-center gap-1 focus-visible:outline-2 focus-visible:outline-amber-400 active:scale-[0.98]"
           >
             <span className="font-display text-sm font-bold leading-tight">
               Criar Cardápio em PDF
@@ -141,7 +182,8 @@ export default function App() {
             )}
             target="_blank"
             rel="noopener noreferrer"
-            className="min-h-[68px] px-4 py-3.5 rounded-xl bg-slate-100 hover:bg-white text-slate-950 transition-all flex flex-col items-center justify-center text-center gap-1 shadow-lg focus-visible:outline-2 focus-visible:outline-amber-400"
+            onClick={playClickSound}
+            className="min-h-[68px] px-4 py-3.5 rounded-xl bg-slate-100 hover:bg-white text-slate-950 transition-all flex flex-col items-center justify-center text-center gap-1 shadow-lg focus-visible:outline-2 focus-visible:outline-amber-400 active:scale-[0.98]"
           >
             <span className="font-display text-sm font-bold leading-tight">
               Cardápio Virtual Simples
@@ -158,7 +200,8 @@ export default function App() {
             )}
             target="_blank"
             rel="noopener noreferrer"
-            className="min-h-[68px] px-4 py-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 transition-all flex flex-col items-center justify-center text-center gap-1 shadow-lg shadow-amber-500/15 focus-visible:outline-2 focus-visible:outline-white"
+            onClick={playClickSound}
+            className="min-h-[68px] px-4 py-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 transition-all flex flex-col items-center justify-center text-center gap-1 shadow-lg shadow-amber-500/15 focus-visible:outline-2 focus-visible:outline-white active:scale-[0.98]"
           >
             <span className="font-display text-sm font-bold leading-tight">
               Cardápio com Painel
@@ -179,6 +222,7 @@ export default function App() {
               )}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={playClickSound}
               className="font-bold text-amber-400 hover:text-amber-300 underline underline-offset-4 tabular-nums"
             >
               WhatsApp {DISPLAY_PHONE}
@@ -191,7 +235,8 @@ export default function App() {
             )}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-900 hover:bg-slate-800 text-xs sm:text-sm font-semibold text-white transition-colors whitespace-nowrap shrink-0"
+            onClick={playClickSound}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-900 hover:bg-slate-800 text-xs sm:text-sm font-semibold text-white transition-all whitespace-nowrap shrink-0 active:scale-[0.98]"
           >
             <MessageCircle className="w-4 h-4 text-emerald-400" />
             <span>Ver Exemplo</span>
