@@ -1,0 +1,6 @@
+{
+  "name": "Cardápio Digital Profissional",
+  "description": "Transforme seu cardápio em PDF em um Catálogo Online profissional por R$ 50 ou com painel próprio por R$ 100.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
